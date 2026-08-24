@@ -56,7 +56,7 @@ jobs:
         image-ref: 'mlops-house-api:${{ github.sha }}'
         format: 'table'
         exit-code: '0' # Đổi thành '1' nếu muốn pipeline fail khi phát hiện lỗ hổng Critical
-        vuln-type: 'os,package'
+    ##    vuln-type: 'os,package'
         severity: 'CRITICAL,HIGH'
 
     # 8. (Tùy chọn) Đăng nhập và Push Image lên Docker Hub / Container Registry
