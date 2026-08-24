@@ -1,0 +1,51 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# --- Virtual Environments ---
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# --- MLOps: MLflow & Data Tracking ---
+# Thư mục mlruns chứa lịch sử train local, database sqlite (mlflow.db).
+# Trong thực tế, MLflow sẽ trỏ tới remote tracking server (như S3/PostgreSQL), không đẩy lên Git.
+mlruns/
+mlflow.db
+*.sqlite
+
+# Dữ liệu thô lớn (Nếu dùng DVC, dữ liệu thực sẽ đẩy lên Cloud, chỉ giữ lại file .dvc nhẹ)
+data/raw/
+data/processed/
+*.csv
+*.parquet
+
+# --- IDE & OS specific ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
