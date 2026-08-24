@@ -1,0 +1,72 @@
+name: MLOps CI/CD Pipeline
+
+on:
+  push:
+  #   branches: [ "main", "master" ]
+  # pull_request:
+  #   branches: [ "main", "master" ]
+
+jobs:
+  mlops-pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Checkout mã nguồn từ repository
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # 2. Thiết lập môi trường Python
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10"
+        cache: 'pip'
+
+    # 3. Cài đặt các thư viện phụ thuộc
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 pytest
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+    # 4. Kiểm tra mã nguồn (Linter - Flake8)
+    # Giúp đảm bảo code tuân thủ chuẩn PEP8, không có lỗi cú pháp cơ bản
+    - name: Lint with flake8
+      run: |
+        # Dừng build nếu có lỗi cú pháp hoặc biến không sử dụng
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # Cảnh báo các lỗi style code thông thường
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+    # 5. Kiểm tra bảo mật mã nguồn (SAST với Bandit - Tùy chọn)
+    - name: Run Bandit Security Scan
+      run: |
+        pip install bandit
+        bandit -r app.py -ll || true
+
+    # 6. Build Docker Image (Kiểm tra xem Dockerfile có build thành công không)
+    - name: Build Docker image
+      run: |
+        docker build -t mlops-house-api:${{ github.sha }} .
+
+    # 7. Quét lỗ hổng bảo mật Container Image (Sử dụng Trivy - Công cụ DevSecOps chuẩn mực)
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: 'mlops-house-api:${{ github.sha }}'
+        format: 'table'
+        exit-code: '0' # Đổi thành '1' nếu muốn pipeline fail khi phát hiện lỗ hổng Critical
+        vuln-type: 'os,package'
+        severity: 'CRITICAL,HIGH'
+
+    # 8. (Tùy chọn) Đăng nhập và Push Image lên Docker Hub / Container Registry
+    # - name: Log in to Docker Hub
+    #   uses: docker/login-action@v3
+    #   with:
+    #     username: ${{ secrets.DOCKER_HUB_USERNAME }}
+    #     password: ${{ secrets.DOCKER_HUB_TOKEN }}
+    # 
+    # - name: Push Docker Image
+    #   run: |
+    #     docker tag mlops-house-api:${{ github.sha }} your-dockerhub-username/mlops-house-api:latest
+    #     docker push your-dockerhub-username/mlops-house-api:latest
