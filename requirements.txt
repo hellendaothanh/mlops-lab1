@@ -8,7 +8,7 @@ pandas>=2.2
 scipy>=1.11
 mlflow>=3.15.0
 pyarrow>=23.0.1
-cryptography>=50.0.0
 
 # Lưu ý sản phẩm thật: pin đúng phiên bản + hash (pip-compile / uv pip compile)
 # để khóa chuỗi cung ứng (supply chain) — xem ROADMAP.md giai đoạn D.
+
