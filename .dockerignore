@@ -1,0 +1,23 @@
+# Loại trừ khỏi build context: giữ image gọn và tránh đưa dữ liệu/secrets vào image
+.git
+.github
+.gitignore
+__pycache__
+*.pyc
+.venv
+venv
+
+# Tracking store cục bộ - KHÔNG đóng gói vào image
+mlruns
+mlflow.db
+mlflow.db-journal
+
+# Tài liệu, kiểm thử, giám sát (chỉ phục vụ dev/CI)
+docs
+tests
+temp
+reports
+
+# Artifact serving được COPY có chọn lọc trong Dockerfile,
+# loại trừ phần không cần thiết để image sạch nhất có thể
+artifacts/reference_data.csv

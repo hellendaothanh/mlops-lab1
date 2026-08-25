@@ -1,0 +1,13 @@
+[flake8]
+# Ngưỡng độ dài dòng của dự án (khớp với bước lint trong mlops-ci.yml)
+max-line-length = 127
+exclude =
+    .git,
+    __pycache__,
+    .venv,
+    venv,
+    mlruns,
+    artifacts,
+    reports,
+    temp,
+    docs

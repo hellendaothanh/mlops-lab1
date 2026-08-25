@@ -44,6 +44,13 @@ data/processed/
 *.csv
 *.parquet
 
+# --- Lab 2: output sinh ra bởi train.py / monitor_drift.py / pytest ---
+# Model pickle KHÔNG commit vào Git; CI truyền qua upload/download-artifact
+artifacts/
+reports/
+.pytest_cache/
+bandit_report.json
+
 # --- IDE & OS specific ---
 .vscode/
 .idea/

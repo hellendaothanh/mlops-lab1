@@ -1,0 +1,10 @@
+# Công cụ cho phát triển, kiểm thử và bảo mật (không đưa vào image production)
+-r requirements.txt
+
+pytest>=8.0
+httpx>=0.27
+flake8>=7.0
+bandit>=1.7
+pip-audit>=2.7
+# Evidently chỉ cần cho monitor_drift.py (job giám sát riêng), không cần trong image serving
+evidently>=0.4.4

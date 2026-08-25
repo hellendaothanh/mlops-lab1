@@ -1,5 +1,12 @@
-fastapi
-uvicorn
-pydantic
-scikit-learn
-numpy
+# Runtime cốt lõi cho training + serving (image Docker chỉ cần các gói này)
+fastapi>=0.110
+uvicorn>=0.29
+pydantic>=2.6
+scikit-learn>=1.4
+numpy>=1.26
+pandas>=2.2
+scipy>=1.11
+mlflow>=2.12
+
+# Lưu ý sản phẩm thật: pin đúng phiên bản + hash (pip-compile / uv pip compile)
+# để khóa chuỗi cung ứng (supply chain) — xem ROADMAP.md giai đoạn D.

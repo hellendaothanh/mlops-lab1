@@ -1,23 +1,28 @@
-# Sử dụng Python slim image chính thức để tối ưu dung lượng và bảo mật
+# Image serving tối ưu bảo mật: slim, non-root, không công cụ build dư thừa
 FROM python:3.10-slim
 
-# Thiết lập thư mục làm việc bên trong container
 WORKDIR /app
 
-# Cài đặt các gói hệ thống tối thiểu
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    && rm -rf /var/lib/apt/lists/*
-
-# Copy file requirements và cài đặt thư viện
+# Không cài build-essential: mọi dependency đều có wheel chính thức
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy mã nguồn ứng dụng (app.py) vào container
+# Copy ứng dụng và artifact model đã được CI train + kiểm định trước đó
+# (job build-and-scan tải artifacts/ từ bước train-and-register)
 COPY app.py .
+COPY artifacts/iris_model ./artifacts/iris_model
+COPY artifacts/model_meta.json ./artifacts/model_meta.json
 
-# Expose cổng mà ứng dụng sẽ chạy
+# Chạy bằng user thường, không phải root (giảm thiểu tác động nếu bị chiếm quyền)
+RUN useradd --create-home appuser && chown -R appuser:appuser /app
+USER appuser
+
+ENV MLFLOW_LOCAL_MODEL_PATH=/app/artifacts/iris_model \
+    MLFLOW_META_PATH=/app/artifacts/model_meta.json
+
 EXPOSE 8000
 
-# Lệnh khởi chạy ứng dụng khi container start
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD python -c "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3).status==200 else 1)"
+
 CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
