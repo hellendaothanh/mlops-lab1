@@ -1,0 +1,34 @@
+# .trivyignore — danh sách CVE được chấp nhận rủi ro (risk acceptance)
+# Trivy tự đọc file này khi chạy ở thư mục gốc repo.
+#
+# QUY TẮC: mỗi entry PHẢI có (1) lý do (2) đánh giá rủi ro (3) điều kiện gỡ.
+# Review lại định kỳ — ignore không có hạn sử dụng là nợ bảo mật.
+
+# CVE-2026-69247 / cryptography < 50.0.0
+# Lý do: mlflow 3.15.1 khoá cứng "cryptography<50,>=43.0.0" nên pip không thể
+#        cài bản vá. Đã kiểm tra mlflow mới nhất trên PyPI vẫn giữ ràng buộc.
+# Rủi ro: image serving chỉ dùng mlflow.sklearn.load_model cục bộ; code path
+#         liên quan (auth/S3 signing) không được kích hoạt tại runtime.
+# Điều kiện gỡ: khi mlflow phát hành bản cho phép cryptography>=50.0.0,
+#        xoá dòng dưới đây VÀ --ignore-vuln PYSEC-2026-3552 trong mlops-ci.yml.
+CVE-2026-69247
+
+# ---------------------------------------------------------------------------
+# HAI ENTRY DƯỚI ĐÂY LÀ "METADATA GHOST" TỪ BASE IMAGE - KHÔNG PHẢI CODE THẬT
+#
+# Phân tích pháp y (dissect layer bằng docker save + tar):
+#   Layer 2 của python:3.10-slim chứa ĐỒNG THỜI wheel-0.45.1.dist-info và
+#   wheel-0.46.3.dist-info (bản đã vá), cùng jaraco.context-5.3.0.dist-info.
+#   Nguyên nhân: quá trình build base image nâng cấp pip/wheel/setuptools nhưng
+#   để sót thư mục .dist-info của bản cũ. Code thực tế đang chạy là bản ĐÃ VÁ
+#   (pip show xác nhận). Trivy đọc METADATA cũ nên báo CVE "installed".
+#
+#   Dockerfile đã chủ động gỡ wheel + jaraco.context khỏi runtime (xem bước
+#   RUN pip install ... && pip uninstall) - filesystem cuối KHÔNG chứa chúng.
+#
+# Điều kiện gỡ: khi ảnh chính thức python:3.10-slim dọn sạch dist-info trùng,
+#   hoặc khi chuyển sang base khác (distroless / multi-stage tự quản).
+# Theo dõi: re-scan định kỳ mỗi lần refresh base image digest.
+# ---------------------------------------------------------------------------
+CVE-2026-24049
+CVE-2026-23949

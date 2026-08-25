@@ -136,6 +136,10 @@ jobs:
           exit-code: "1"
           severity: "CRITICAL,HIGH"
           scanners: "vuln,secret"
+          # Chỉ báo cáo CVE ĐÃ CÓ BẢN VÁ (có thể hành động). Các CVE base image
+          # chưa có bản vá (fix_deferred/affected) sẽ gây nhiễu vĩnh viễn nếu
+          # không lọc. Ngoại lệ có kiểm soát nằm trong file .trivyignore.
+          ignore-unfixed: true
 
       - name: Start container
         run: |

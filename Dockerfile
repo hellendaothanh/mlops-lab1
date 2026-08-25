@@ -3,9 +3,13 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
-# Không cài build-essential: mọi dependency đều có wheel chính thức
+# Không cài build-essential: mọi dependency đều có wheel chính thức.
+# Gỡ thêm build-tool dư thừa mà base image có thể mang theo (wheel, jaraco.*)
+# — không dùng lúc runtime nhưng lại là bề mặt tấn công trong report Trivy.
+# Dấu || true: một số biến thể base image không chứa chúng, uninstall sẽ lỗi.
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt && \
+    (pip uninstall -y --no-input wheel jaraco.context 2>/dev/null || true)
 
 # Copy ứng dụng và artifact model đã được CI train + kiểm định trước đó
 # (job build-and-scan tải artifacts/ từ bước train-and-register)
